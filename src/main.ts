@@ -17,7 +17,7 @@ import {
   
   interface IMDBLookupSettings {
 	apiKey: string;
-	targetFolder: string;
+	targetFolders: string[];
 	imdbIdProperty: string;
 	fieldMappings: FieldMapping[];
   }
@@ -49,7 +49,7 @@ import {
   
   const DEFAULT_SETTINGS: IMDBLookupSettings = {
 	apiKey: "",
-	targetFolder: "Movies",
+	targetFolders: ["Movies"],
 	imdbIdProperty: "imdbid",
 	fieldMappings: [
 	  { omdbField: "Title", noteProperty: "title", enabled: true },
@@ -111,7 +111,14 @@ import {
 	}
   
 	async loadSettings() {
-	  this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	  const data = await this.loadData() as IMDBLookupSettings & { targetFolder?: string };
+	  this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+	  
+	  // Migrate old single targetFolder to targetFolders array
+	  if (data?.targetFolder && !data?.targetFolders) {
+		this.settings.targetFolders = [data.targetFolder];
+	  }
+	  
 	  // Merge any new default field mappings that might have been added
 	  const existingFields = new Set(
 		this.settings.fieldMappings.map((m) => m.omdbField)
@@ -147,27 +154,39 @@ import {
 		new Notice("Please configure your OMDB API key in settings");
 		return;
 	  }
-  
-	  const folder = this.app.vault.getAbstractFileByPath(
-		this.settings.targetFolder
-	  );
-	  if (!folder || !(folder instanceof TFolder)) {
-		new Notice(`Folder "${this.settings.targetFolder}" not found`);
+
+	  if (this.settings.targetFolders.length === 0) {
+		new Notice("Please configure at least one target folder in settings");
 		return;
 	  }
-  
-	  const files = this.getMarkdownFilesRecursively(folder);
+
+	  const files: TFile[] = [];
+	  const missingFolders: string[] = [];
+
+	  for (const folderPath of this.settings.targetFolders) {
+		const folder = this.app.vault.getAbstractFileByPath(folderPath);
+		if (!folder || !(folder instanceof TFolder)) {
+		  missingFolders.push(folderPath);
+		  continue;
+		}
+		files.push(...this.getMarkdownFilesRecursively(folder));
+	  }
+
+	  if (missingFolders.length > 0) {
+		new Notice(`Folders not found: ${missingFolders.join(", ")}`);
+	  }
+
 	  if (files.length === 0) {
-		new Notice(`No markdown files found in "${this.settings.targetFolder}"`);
+		new Notice("No markdown files found in target folders");
 		return;
 	  }
-  
+
 	  new Notice(`Starting sync for ${files.length} files...`);
-  
+
 	  let synced = 0;
 	  let skipped = 0;
 	  let errors = 0;
-  
+
 	  for (const file of files) {
 		try {
 		  const result = await this.syncNote(file, true);
@@ -181,7 +200,7 @@ import {
 		// Rate limiting - OMDB free tier has limits
 		await this.sleep(250);
 	  }
-  
+
 	  new Notice(
 		`Sync complete: ${synced} synced, ${skipped} skipped, ${errors} errors`
 	  );
@@ -349,14 +368,17 @@ import {
 		);
   
 	  new Setting(containerEl)
-		.setName("Target Folder")
-		.setDesc("The folder containing your movie notes")
-		.addText((text) =>
+		.setName("Target folders")
+		.setDesc("Folders containing your movie/TV show notes (one per line)")
+		.addTextArea((text) =>
 		  text
-			.setPlaceholder("Movies")
-			.setValue(this.plugin.settings.targetFolder)
+			.setPlaceholder("Movies\nTV Shows")
+			.setValue(this.plugin.settings.targetFolders.join("\n"))
 			.onChange(async (value) => {
-			  this.plugin.settings.targetFolder = value;
+			  this.plugin.settings.targetFolders = value
+				.split("\n")
+				.map((f) => f.trim())
+				.filter((f) => f.length > 0);
 			  await this.plugin.saveSettings();
 			})
 		);
