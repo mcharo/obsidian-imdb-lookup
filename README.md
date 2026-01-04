@@ -1,13 +1,18 @@
 # IMDB Lookup Plugin for Obsidian
 
-Sync movie data from the OMDB API directly into your Obsidian notes.
+Sync movie and TV show data from the OMDB API directly into your Obsidian notes.
 
 ## Features
 
-- Automatically fetch movie metadata using IMDB IDs
-- Configurable target folder for movie notes
-- Customizable field mappings (choose which OMDB fields map to which note properties)
-- Sync individual notes or batch sync entire folder
+- Fetch metadata for movies and TV shows using IMDB IDs
+- Support for multiple target folders (e.g., Movies, TV Shows)
+- Customizable field mappings with toggles for each field
+- Smart data transformations:
+  - **Actors, Director, Genre, Writer** → Obsidian wiki-links (`[[Name]]`)
+  - **Runtime** → numeric minutes value
+  - **Year** → number
+  - **Released** → ISO date format (YYYY-MM-DD)
+- Sync individual notes or batch sync all target folders
 - Rate-limited API calls to respect OMDB limits
 
 ## Setup
@@ -16,14 +21,14 @@ Sync movie data from the OMDB API directly into your Obsidian notes.
 2. Install the plugin
 3. Go to Settings → IMDB Lookup
 4. Enter your OMDB API key
-5. Configure your target folder (default: "Movies")
+5. Configure your target folders (default: "Movies")
 6. Customize field mappings as needed
 
 ## Usage
 
-### Note Format
+### Note format
 
-Your movie notes need an IMDB ID in the frontmatter:
+Your notes need an IMDB ID in the frontmatter:
 
 ```yaml
 ---
@@ -36,10 +41,10 @@ The IMDB ID can be found in any IMDB URL, e.g., `https://www.imdb.com/title/tt38
 
 ### Commands
 
-- **Sync all movies from OMDB**: Syncs all notes in your target folder that have an IMDB ID
+- **Sync all notes from OMDB**: Syncs all notes in your target folders that have an IMDB ID
 - **Sync current note from OMDB**: Syncs only the currently open note
 
-### After Syncing
+### After syncing
 
 Your note frontmatter will be updated with the configured fields:
 
@@ -47,13 +52,20 @@ Your note frontmatter will be updated with the configured fields:
 ---
 imdbid: tt3896198
 title: Guardians of the Galaxy Vol. 2
-year: "2017"
+year: 2017
 rated: PG-13
-released: 05 May 2017
-runtime: 136 min
-genre: Action, Adventure, Comedy
-director: James Gunn
-actors: Chris Pratt, Zoe Saldaña, Dave Bautista
+released: 2017-05-05
+runtime: 136
+genre:
+  - "[[Action]]"
+  - "[[Adventure]]"
+  - "[[Comedy]]"
+director:
+  - "[[James Gunn]]"
+actors:
+  - "[[Chris Pratt]]"
+  - "[[Zoe Saldaña]]"
+  - "[[Dave Bautista]]"
 plot: The Guardians struggle to keep together as a team...
 poster: https://m.media-amazon.com/images/M/...
 imdbrating: "7.6"
@@ -62,16 +74,22 @@ imdbrating: "7.6"
 
 ## Settings
 
-### API Key
+### OMDB API key
 Your OMDB API key (required).
 
-### Target Folder
-The folder containing your movie notes. Default: `Movies`
+### Target folders
+The folders containing your movie/TV show notes. Enter one folder path per line. Default: `Movies`
 
-### IMDB ID Property
+Example:
+```
+Movies
+TV Shows
+```
+
+### IMDB ID property
 The frontmatter property name containing the IMDB ID. Default: `imdbid`
 
-### Field Mappings
+### Field mappings
 Configure which OMDB fields to sync and what property names to use in your notes. Toggle fields on/off and customize the property names.
 
 Available OMDB fields:
@@ -92,6 +110,9 @@ npm run dev
 
 # Build for production
 npm run build
+
+# Lint
+npm run lint
 ```
 
 ## License
