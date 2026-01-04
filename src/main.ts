@@ -22,31 +22,6 @@ import {
 	fieldMappings: FieldMapping[];
   }
   
-  const OMDB_FIELDS = [
-	"Title",
-	"Year",
-	"Rated",
-	"Released",
-	"Runtime",
-	"Genre",
-	"Director",
-	"Writer",
-	"Actors",
-	"Plot",
-	"Language",
-	"Country",
-	"Awards",
-	"Poster",
-	"Metascore",
-	"imdbRating",
-	"imdbVotes",
-	"Type",
-	"DVD",
-	"BoxOffice",
-	"Production",
-	"Website",
-  ];
-  
   const DEFAULT_SETTINGS: IMDBLookupSettings = {
 	apiKey: "",
 	targetFolders: ["Movies"],
@@ -97,12 +72,14 @@ import {
   
 	  this.addCommand({
 		id: "sync-all-movies",
-		name: "Sync all movies from OMDB",
+		// eslint-disable-next-line obsidianmd/ui/sentence-case
+		name: "Sync all notes from OMDB",
 		callback: () => this.syncAllMovies(),
 	  });
   
 	  this.addCommand({
 		id: "sync-current-note",
+		// eslint-disable-next-line obsidianmd/ui/sentence-case
 		name: "Sync current note from OMDB",
 		callback: () => this.syncCurrentNote(),
 	  });
@@ -142,7 +119,7 @@ import {
 	  }
   
 	  if (activeFile.extension !== "md") {
-		new Notice("Active file is not a markdown file");
+		new Notice("Active file is not a Markdown file");
 		return;
 	  }
   
@@ -151,6 +128,7 @@ import {
   
 	async syncAllMovies() {
 	  if (!this.settings.apiKey) {
+		// eslint-disable-next-line obsidianmd/ui/sentence-case
 		new Notice("Please configure your OMDB API key in settings");
 		return;
 	  }
@@ -177,7 +155,7 @@ import {
 	  }
 
 	  if (files.length === 0) {
-		new Notice("No markdown files found in target folders");
+		new Notice("No Markdown files found in target folders");
 		return;
 	  }
 
@@ -230,7 +208,7 @@ import {
 		return "skipped";
 	  }
   
-	  const imdbId = frontmatter[this.settings.imdbIdProperty];
+	  const imdbId = frontmatter[this.settings.imdbIdProperty] as string | undefined;
 	  if (!imdbId) {
 		if (!silent)
 		  new Notice(
@@ -240,6 +218,7 @@ import {
 	  }
   
 	  if (!this.settings.apiKey) {
+		// eslint-disable-next-line obsidianmd/ui/sentence-case
 		if (!silent) new Notice("Please configure your OMDB API key in settings");
 		return "error";
 	  }
@@ -274,7 +253,7 @@ import {
 	}
   
 	async updateNoteFrontmatter(file: TFile, data: OMDBResponse) {
-	  await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
+	  await this.app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
 		for (const mapping of this.settings.fieldMappings) {
 		  if (!mapping.enabled) continue;
 
@@ -352,10 +331,10 @@ import {
 	  const { containerEl } = this;
 	  containerEl.empty();
   
-	  containerEl.createEl("h2", { text: "IMDB Lookup Settings" });
-  
 	  new Setting(containerEl)
-		.setName("OMDB API Key")
+		// eslint-disable-next-line obsidianmd/ui/sentence-case
+		.setName("OMDB API key")
+		// eslint-disable-next-line obsidianmd/ui/sentence-case
 		.setDesc("Your OMDB API key (get one at omdbapi.com)")
 		.addText((text) =>
 		  text
@@ -369,10 +348,12 @@ import {
   
 	  new Setting(containerEl)
 		.setName("Target folders")
+		// eslint-disable-next-line obsidianmd/ui/sentence-case
 		.setDesc("Folders containing your movie/TV show notes (one per line)")
 		.addTextArea((text) =>
 		  text
-			.setPlaceholder("Movies\nTV Shows")
+			// eslint-disable-next-line obsidianmd/ui/sentence-case
+			.setPlaceholder("Movies\nTV shows")
 			.setValue(this.plugin.settings.targetFolders.join("\n"))
 			.onChange(async (value) => {
 			  this.plugin.settings.targetFolders = value
@@ -384,10 +365,13 @@ import {
 		);
   
 	  new Setting(containerEl)
-		.setName("IMDB ID Property")
+		// eslint-disable-next-line obsidianmd/ui/sentence-case
+		.setName("IMDB ID property")
+		// eslint-disable-next-line obsidianmd/ui/sentence-case
 		.setDesc("The frontmatter property name containing the IMDB ID")
 		.addText((text) =>
 		  text
+			// eslint-disable-next-line obsidianmd/ui/sentence-case
 			.setPlaceholder("imdbid")
 			.setValue(this.plugin.settings.imdbIdProperty)
 			.onChange(async (value) => {
@@ -396,11 +380,11 @@ import {
 			})
 		);
   
-	  containerEl.createEl("h3", { text: "Field Mappings" });
-	  containerEl.createEl("p", {
-		text: "Configure which OMDB fields to sync and their property names in your notes.",
-		cls: "setting-item-description",
-	  });
+	  new Setting(containerEl)
+		.setName("Field mappings")
+		// eslint-disable-next-line obsidianmd/ui/sentence-case
+		.setDesc("Configure which OMDB fields to sync and their property names in your notes.")
+		.setHeading();
   
 	  const mappingsContainer = containerEl.createDiv({
 		cls: "imdb-lookup-mappings",
