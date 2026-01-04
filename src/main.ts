@@ -258,13 +258,44 @@ import {
 	  await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
 		for (const mapping of this.settings.fieldMappings) {
 		  if (!mapping.enabled) continue;
-  
+
 		  const value = data[mapping.omdbField];
 		  if (value !== undefined && value !== "N/A") {
-			frontmatter[mapping.noteProperty] = value;
+			frontmatter[mapping.noteProperty] = this.transformValue(mapping.omdbField, value);
 		  }
 		}
 	  });
+	}
+
+	/**
+	 * Transform OMDB field values for Obsidian frontmatter
+	 * - Actors, Director, Genre, Writer: convert to array of wiki-links
+	 * - Runtime: extract numeric minutes value
+	 */
+	transformValue(field: string, value: string | OMDBRating[]): string | number | string[] {
+	  if (typeof value !== "string") {
+		return value as unknown as string;
+	  }
+
+	  // Fields that should be converted to wiki-links
+	  const linkFields = ["Actors", "Director", "Genre", "Writer"];
+	  if (linkFields.includes(field)) {
+		return value
+		  .split(",")
+		  .map((item) => item.trim())
+		  .filter((item) => item.length > 0)
+		  .map((item) => `[[${item}]]`);
+	  }
+
+	  // Runtime: extract number from "136 min"
+	  if (field === "Runtime") {
+		const match = value.match(/^(\d+)/);
+		if (match?.[1]) {
+		  return parseInt(match[1], 10);
+		}
+	  }
+
+	  return value;
 	}
   
 	sleep(ms: number): Promise<void> {
