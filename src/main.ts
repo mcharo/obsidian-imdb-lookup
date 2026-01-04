@@ -271,6 +271,8 @@ import {
 	 * Transform OMDB field values for Obsidian frontmatter
 	 * - Actors, Director, Genre, Writer: convert to array of wiki-links
 	 * - Runtime: extract numeric minutes value
+	 * - Year: convert to number
+	 * - Released: convert to ISO date string (YYYY-MM-DD)
 	 */
 	transformValue(field: string, value: string | OMDBRating[]): string | number | string[] {
 	  if (typeof value !== "string") {
@@ -292,6 +294,22 @@ import {
 		const match = value.match(/^(\d+)/);
 		if (match?.[1]) {
 		  return parseInt(match[1], 10);
+		}
+	  }
+
+	  // Year: convert to number
+	  if (field === "Year") {
+		const year = parseInt(value, 10);
+		if (!isNaN(year)) {
+		  return year;
+		}
+	  }
+
+	  // Released: convert "05 May 2017" to "2017-05-05"
+	  if (field === "Released") {
+		const date = new Date(value);
+		if (!isNaN(date.getTime())) {
+		  return date.toISOString().split("T")[0] ?? value;
 		}
 	  }
 
