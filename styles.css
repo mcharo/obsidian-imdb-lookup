@@ -1,8 +1,24 @@
-/*
+.imdb-lookup-mappings {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.imdb-lookup-mapping {
+    background: var(--background-secondary);
+    border-radius: 8px;
+    padding: 4px 12px;
+}
 
-If your plugin does not need CSS, delete this file.
+.imdb-lookup-mapping .setting-item {
+    border-top: none;
+    padding: 8px 0;
+}
 
-*/
+.imdb-lookup-mapping .setting-item-control {
+    gap: 12px;
+}
+
+.imdb-lookup-mapping .setting-item-control input[type="text"] {
+    width: 150px;
+}

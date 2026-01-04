@@ -1,11 +1,10 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
-	"isDesktopOnly": false
+  "id": "imdb-lookup",
+  "name": "IMDB Lookup",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Sync movie data from OMDB API into your notes based on IMDB IDs",
+  "author": "Michael Charo",
+  "authorUrl": "https://github.com/mcharo",
+  "isDesktopOnly": false
 }
