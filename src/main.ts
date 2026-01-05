@@ -796,7 +796,6 @@ class IMDBLookupSettingTab extends PluginSettingTab {
 			.setDesc("Optional template file for new TV series notes")
 			.addText((text) =>
 				text
-					// eslint-disable-next-line obsidianmd/ui/sentence-case
 					.setPlaceholder("Templates/TV Show.md")
 					.setValue(this.plugin.settings.templateFileSeries)
 					.onChange(async (value) => {
@@ -807,8 +806,7 @@ class IMDBLookupSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Field mappings")
-			// eslint-disable-next-line obsidianmd/ui/sentence-case
-			.setDesc(
+			.setDesc( // eslint-disable-next-line obsidianmd/ui/sentence-case
 				"Configure which OMDB fields to sync and their property names in your notes."
 			)
 			.setHeading();
