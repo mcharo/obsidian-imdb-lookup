@@ -22,3 +22,21 @@
 .imdb-lookup-mapping .setting-item-control input[type="text"] {
     width: 150px;
 }
+
+/* Modal styles */
+.imdb-lookup-input-container {
+    margin: 16px 0;
+}
+
+.imdb-lookup-input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.imdb-lookup-button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
